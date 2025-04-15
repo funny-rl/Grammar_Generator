@@ -84,7 +84,7 @@ class TaskRunner:
 
         else:
             raise NotImplementedError
-        
+
         from verl.trainer.ppo.ray_trainer import ResourcePoolManager, Role
 
         role_worker_mapping = {
@@ -165,4 +165,3 @@ class TaskRunner:
 
 if __name__ == '__main__':
     main()
-    

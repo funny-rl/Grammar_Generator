@@ -1,12 +1,5 @@
 
-import re
 
-def extract_solution(solution_str):
-    solution = re.search("#### (\\-?[0-9\\.\\,]+)", solution_str) # extract the solution after ####
-    assert solution is not None
-    final_solution = solution.group(0)
-    final_solution = final_solution.split('#### ')[1].replace(',', '')
-    return final_solution
 
 
 if __name__ == '__main__':
@@ -24,8 +17,13 @@ if __name__ == '__main__':
     train_dataset = dataset['train']
     test_dataset = dataset["test"]
     
-    instruction_following = "Let's think step by step and output the final answer after \"####\"."
-
+    instruction_following = \
+    """
+        After solving the problem step by step through reasoning, print the answer in Python dictionary format. 
+        This dictionary should consist of the keys 'productions' and 'constraints', and the final answer should begin with ####. 
+        As an example, if the prompt is 'Input\n\nThe first line contains one integer n (1 <= n <= 15) --- the number of rotations.\n\nEach of the following n lines contains one integer a_i (1 <= a_i <= 180) --- the angle of the i-th rotation in degrees.', 
+        then the answer should be ####{'productions': ['<S>->[n] <n> <T_n>', '<T_i>-><T_i-1> <n> a_i', '<T_1>->a_i'], 'constraints': ['1<=n<=15', '1<=a_i<=180']}
+    """
     def make_map_fn(split):
 
         def process_fn(example, idx):

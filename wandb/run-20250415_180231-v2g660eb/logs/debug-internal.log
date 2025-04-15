@@ -1,7 +1,0 @@
-{"time":"2025-04-15T18:02:31.685576013+09:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/gpfs/home1/aiphw227/grammar_generator_verl/wandb/run-20250415_180231-v2g660eb/logs/debug-core.log"}
-{"time":"2025-04-15T18:02:32.051623517+09:00","level":"INFO","msg":"created new stream","id":"v2g660eb"}
-{"time":"2025-04-15T18:02:32.051672961+09:00","level":"INFO","msg":"stream: started","id":"v2g660eb"}
-{"time":"2025-04-15T18:02:32.05171869+09:00","level":"INFO","msg":"writer: Do: started","stream_id":"v2g660eb"}
-{"time":"2025-04-15T18:02:32.051749823+09:00","level":"INFO","msg":"handler: started","stream_id":"v2g660eb"}
-{"time":"2025-04-15T18:02:32.051719006+09:00","level":"INFO","msg":"sender: started","stream_id":"v2g660eb"}
-{"time":"2025-04-15T18:02:32.385879852+09:00","level":"INFO","msg":"Starting system monitor"}

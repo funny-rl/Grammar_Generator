@@ -8,5 +8,5 @@ __pycache__/
 *.pickle
 *.ipynb_checkpoints
 
-output/
+outputs/
 wandb/

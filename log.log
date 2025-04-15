@@ -209,3 +209,81 @@
 [36m(TaskRunner pid=1496527)[0m wandb: Syncing run GRPO_1_5B
 [36m(TaskRunner pid=1496527)[0m wandb: ⭐️ View project at https://wandb.ai/singfor7012/Grammar_Generation
 [36m(TaskRunner pid=1496527)[0m wandb: 🚀 View run at https://wandb.ai/singfor7012/Grammar_Generation/runs/r3znu1ft
+
+[36m(WorkerDict pid=1497406)[0m   "attention_dropout": 0.0,
+[36m(WorkerDict pid=1497406)[0m   "bos_token_id": 151646,
+[36m(WorkerDict pid=1497406)[0m   "eos_token_id": 151643,
+[36m(WorkerDict pid=1497406)[0m   "hidden_act": "silu",
+[36m(WorkerDict pid=1497406)[0m   "hidden_size": 1536,
+[36m(WorkerDict pid=1497406)[0m   "initializer_range": 0.02,
+[36m(WorkerDict pid=1497406)[0m   "intermediate_size": 8960,
+[36m(WorkerDict pid=1497406)[0m   "max_position_embeddings": 131072,
+[36m(WorkerDict pid=1497406)[0m   "max_window_layers": 21,
+[36m(WorkerDict pid=1497406)[0m   "model_type": "qwen2",
+[36m(WorkerDict pid=1497406)[0m   "num_attention_heads": 12,
+[36m(WorkerDict pid=1497406)[0m   "num_hidden_layers": 28,
+[36m(WorkerDict pid=1497406)[0m   "num_key_value_heads": 2,
+[36m(WorkerDict pid=1497406)[0m   "pad_token_id": 151643,
+[36m(WorkerDict pid=1497406)[0m   "rms_norm_eps": 1e-06,
+[36m(WorkerDict pid=1497406)[0m   "rope_scaling": null,
+[36m(WorkerDict pid=1497406)[0m   "rope_theta": 10000,
+[36m(WorkerDict pid=1497406)[0m   "sliding_window": 4096,
+[36m(WorkerDict pid=1497406)[0m   "tie_word_embeddings": false,
+[36m(WorkerDict pid=1497406)[0m   "torch_dtype": "bfloat16",
+[36m(WorkerDict pid=1497406)[0m   "transformers_version": "4.51.2",
+[36m(WorkerDict pid=1497406)[0m   "use_cache": true,
+[36m(WorkerDict pid=1497406)[0m   "use_mrope": false,
+[36m(WorkerDict pid=1497406)[0m   "use_sliding_window": false,
+[36m(WorkerDict pid=1497406)[0m   "vocab_size": 151936
+[36m(WorkerDict pid=1497406)[0m }
+[36m(WorkerDict pid=1497406)[0m 
+[36m(WorkerDict pid=1497406)[0m NCCL version 2.21.5+cuda12.4
+[36m(WorkerDict pid=1497406)[0m Qwen2ForCausalLM contains 1.78B parameters
+[36m(WorkerDict pid=1497406)[0m wrap_policy: functools.partial(<function _or_policy at 0x7ef43c7ccae0>, policies=[functools.partial(<function transformer_auto_wrap_policy at 0x7ef43c7cc9a0>, transformer_layer_cls={<class 'transformers.models.qwen2.modeling_qwen2.Qwen2DecoderLayer'>})])
+[36m(WorkerDict pid=1497585)[0m Total steps: 4500, num_warmup_steps: 0
+[36m(WorkerDict pid=1497585)[0m Actor use_remove_padding=False
+[36m(WorkerDict pid=1497585)[0m deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+[36m(WorkerDict pid=1497586)[0m deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+[36m(WorkerDict pid=1497584)[0m deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+[36m(WorkerDict pid=1497406)[0m Before building vllm rollout, memory allocated (GB): 0.8275222778320312, memory reserved (GB): 3.767578125
+[36m(WorkerDict pid=1497406)[0m deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+[36m(WorkerDict pid=1497406)[0m WARNING 04-15 23:18:08 [cuda.py:95] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used
+[36m(WorkerDict pid=1497586)[0m wrap_policy: functools.partial(<function _or_policy at 0x7f0967cc4ae0>, policies=[functools.partial(<function transformer_auto_wrap_policy at 0x7f0967cc49a0>, transformer_layer_cls={<class 'transformers.models.qwen2.modeling_qwen2.Qwen2DecoderLayer'>})])[32m [repeated 3x across cluster][0m
+[36m(WorkerDict pid=1497406)[0m Total steps: 4500, num_warmup_steps: 0[32m [repeated 3x across cluster][0m
+[36m(WorkerDict pid=1497406)[0m Actor use_remove_padding=False[32m [repeated 3x across cluster][0m
+[36m(WorkerDict pid=1497406)[0m WARNING 04-15 23:18:09 [utils.py:2321] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7ef3c02343d0>
+[36m(WorkerDict pid=1497406)[0m WARNING 04-15 23:18:10 [topk_topp_sampler.py:63] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[36m(WorkerDict pid=1497406)[0m kwargs: {'n': 4, 'logprobs': 0, 'max_tokens': 1024, 'detokenize': False, 'temperature': 1.0, 'top_k': -1, 'top_p': 1, 'ignore_eos': False}
+[36m(WorkerDict pid=1497406)[0m After building vllm rollout, memory allocated (GB): 4.933770656585693, memory reserved (GB): 10.95703125
+[36m(WorkerDict pid=1497406)[0m After building sharding manager, memory allocated (GB): 4.933770656585693, memory reserved (GB): 10.95703125
+[36m(WorkerDict pid=1497586)[0m WARNING 04-15 23:18:08 [cuda.py:95] To see benefits of async output processing, enable CUDA graph. Since, enforce-eager is enabled, async output processor cannot be used[32m [repeated 3x across cluster][0m
+[36m(WorkerDict pid=1497586)[0m WARNING 04-15 23:18:09 [utils.py:2321] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7f08b7f570d0>[32m [repeated 3x across cluster][0m
+[36m(WorkerDict pid=1497586)[0m WARNING 04-15 23:18:10 [topk_topp_sampler.py:63] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.[32m [repeated 3x across cluster][0m
+[36m(TaskRunner pid=1496527)[0m Using LocalLogger is deprecated. The constructor API will change 
+[36m(TaskRunner pid=1496527)[0m Checkpoint tracker file does not exist: %s /gpfs/home1/aiphw227/grammar_generator_verl/checkpoints/Grammar_Generation/GRPO_1_5B/latest_checkpointed_iteration.txt
+[36m(TaskRunner pid=1496527)[0m Training from scratch
+[36m(TaskRunner pid=1496527)[0m test_gen_batch meta info: {'eos_token_id': 151643, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': False, 'validate': True}
+[36m(TaskRunner pid=1496527)[0m validation generation end
+[36m(WorkerDict pid=1497586)[0m kwargs: {'n': 4, 'logprobs': 0, 'max_tokens': 1024, 'detokenize': False, 'temperature': 1.0, 'top_k': -1, 'top_p': 1, 'ignore_eos': False}[32m [repeated 3x across cluster][0m
+[36m(TaskRunner pid=1496527)[0m [prompt] <｜User｜>Input
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m The first line of the input contains the string s consisting of |s| (1<= |s|<= 100) lowercase Latin letters. 
+[36m(TaskRunner pid=1496527)[0m         After solving the problem step by step through reasoning, print the answer in Python dictionary format. 
+[36m(TaskRunner pid=1496527)[0m         This dictionary should consist of the keys 'productions' and 'constraints', and the final answer should begin with ####. 
+[36m(TaskRunner pid=1496527)[0m         As an example, if the prompt is 'Input
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m The first line contains one integer n (1 <= n <= 15) --- the number of rotations.
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m Each of the following n lines contains one integer a_i (1 <= a_i <= 180) --- the angle of the i-th rotation in degrees.', 
+[36m(TaskRunner pid=1496527)[0m         then the answer should be ####{'productions': ['<S>->[n] <n> <T_n>', '<T_i>-><T_i-1> <n> a_i', '<T_1>->a_i'], 'constraints': ['1<=n<=15', '1<=a_i<=180']}
+[36m(TaskRunner pid=1496527)[0m     <｜Assistant｜><think>
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m [response] Okay, so I've got this programming problem to solve. Let's see what it's about. Hmm, the problem statement says that I need to process a series of rotations and then output a specific dictionary format. 
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m Wait, the input is a bit tricky. The first line is an integer n, which is the number of rotations. Then there are n lines each containing an integer a_i, which are the angles of each rotation. After that, I have to output a dictionary with keys 'productions' and 'constraints'. The dictionary should be in a specific format, and it starts with ####.
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m So, the main task is to model the rotations and figure out the production rules and constraints based on the angles. Let me think about how to approach this.
+[36m(TaskRunner pid=1496527)[0m 
+[36m(TaskRunner pid=1496527)[0m First, I need to model the rotations. Each rotation can be thought of as a step that changes the current state. The initial state is probably 0 degrees, and each rotation adds or subtracts the given angle. But wait, the problem says each a_i is a positive integer, so each rotation is a positive step. So, each a_i is added to the current angle.[36m(TaskRunner pid=1496527)[0m Training Progress:   0%|          | 0/4500 [00:00<?, ?it/s]
+[36m(WorkerDict pid=1497586)[0m /home1/aiphw227/miniconda3/envs/verl/lib/python3.11/site-packages/torch/distributed/fsdp/fully_sharded_data_parallel.py:690: FutureWarning: FSDP.state_dict_type() and FSDP.set_state_dict_type() are being deprecated. Please use APIs, get_state_dict() and set_state_dict(), which can support different parallelisms, FSDP1, FSDP2, DDP. API doc: https://pytorch.org/docs/stable/distributed.checkpoint.html#torch.distributed.checkpoint.state_dict.get_state_dict .Tutorial: https://pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html .[32m [repeated 3x across cluster][0m
+[36m(WorkerDict pid=1497586)[0m   warnings.warn([32m [repeated 3x across cluster][0m

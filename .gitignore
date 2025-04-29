@@ -10,3 +10,5 @@ __pycache__/
 
 outputs/
 wandb/
+checkpoints/
+trace_output/

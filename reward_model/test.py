@@ -1,14 +1,18 @@
-import re
-import ast
-from pprint import pprint 
-
+"""Generate testcases from grammar"""
+import argparse
+import logging
+from pathlib import Path
+import random
 from typing import Any, Optional
-import timeout_decorator
-from timeout_decorator.timeout_decorator import TimeoutError 
-from reward_model.grammar.counting_context_free_grammar import CountingContextFreeGrammar as Ccfg
-
-
-
+import re
+import jsonlines
+import timeout_decorator  # type: ignore
+# pylint: disable-next=redefined-builtin
+from timeout_decorator.timeout_decorator import TimeoutError  # type: ignore
+from tqdm import tqdm
+from counting_context_free_grammar import CountingContextFreeGrammar as Ccfg  # type: ignore
+SEED = 42
+random.seed(SEED)
 def is_invalid_terminal(s: str) -> bool:
     return bool(
         any(
@@ -24,7 +28,6 @@ def is_invalid_terminal(s: str) -> bool:
             ]
         )
     )
-    
 def get_testcase(
     ccfg: Ccfg,
     timeout: int,
@@ -58,80 +61,58 @@ def get_testcase(
                     raise e
                 degree += 1
     return testcases
-
 def get_testcases(
-        grammar: dict[str, Any],
-        k: int,
-        timeout: int, 
-    )-> Optional[tuple[list[str], list[int]]]:
-    
+    data: dict[str, Any],
+    k: int,
+    timeout: int,
+) -> Optional[tuple[list[str], list[int]]]:
+    grammar = data["grammar"]
+    if grammar is None:
+        return None
     productions = grammar["productions"]
     constraints = grammar["constraints"]
-    
     # Raise error if any regex production contains a '+' quantifier
     for prod in productions:
         if re.search(r"\[[^\]]+\]\+", prod) or re.search(r"\\[dws]\+", prod):
             raise ValueError(f"Invalid regex pattern with '+' found in production: {prod}")
         if re.search(r"\[[^\]]*\]\*", prod) or re.search(r"\\[dws]\*", prod):
             raise ValueError(f"Invalid regex pattern with '*' found in production: {prod}")
-    
     ccfg = Ccfg(productions, constraints)
     try:
         tuples = get_testcase(ccfg, timeout, -1, 1)
     except TimeoutError:
         tuples = []
-        
     tuples += get_testcase(ccfg, timeout, 2, k)
     tuples += get_testcase(ccfg, timeout, 1, k)
     tuples += get_testcase(ccfg, timeout, 0, k)
     return [t[0] for t in tuples], [t[1] for t in tuples]
-
-def extract_solution(solution_str):
-    answers = list(re.finditer(r"</think>", solution_str))
-    if not answers:
-        return None
-    end_pos = answers[-1].end()
-    return solution_str[end_pos:].strip()    
-
-def compute_score(
-        data_source, 
-        solution_str, 
-        ground_truth, 
-        extra_info=None
-    ):
-    """
-    compute the reward score of the solution string based on the data source and ground truth.
-    """
-    solution = extract_solution(solution_str)
-    total_reward = 0.0
-    if solution is None:
-        return total_reward
-    else:
-        try:
-            solution = ast.literal_eval(solution)
-            if set(solution.keys()) != {"grammar"}:
-                return total_reward
-            
-            grammar = solution["grammar"]
-            if set(grammar.keys()) != {"productions", "constraints"}:
-                return total_reward
-        
-        except Exception as e:
-            return total_reward
-
-        total_reward += 0.01
-
-        try:
-            testcases, methods = get_testcases(
-                grammar = grammar,
-                k=10,
-                timeout = 10,
-            )
-            print(f"\nTestcases: {testcases}")
-            print(f"Methods: {methods}\n")
-            total_reward += 0.99
-            return total_reward
-            
-        except Exception as e:
-            print(f"\nError: {e}\n")
-            return total_reward
+def main(grammar_path: Path, output_path: Path, k: int, timeout: int) -> None:
+    with jsonlines.open(grammar_path, "r") as grammar_dataset:
+        with jsonlines.open(output_path, "w") as writer:
+            for data in tqdm(grammar_dataset):
+                try:
+                    pair = get_testcases(data, k, timeout)
+                    if pair is None:
+                        raise ValueError("Grammar is None")
+                    testcases, methods = pair
+                    data.update(
+                        {
+                            "testcase": testcases,
+                            "methods": methods,
+                        }
+                    )
+                    writer.write(data)
+                except Exception as e:  # pylint: disable=broad-except
+                    logging.warning(data.get("name", "unknown"))
+                    logging.warning("Error: %s", str(e))
+                    data.update({"error": str(e)})
+                    writer.write(data)
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--grammar-data", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--num", type=int, default=10)
+    parser.add_argument("--timeout", type=float, default=10)
+    args = parser.parse_args()
+    main(args.grammar_data, args.output, args.num, args.timeout)

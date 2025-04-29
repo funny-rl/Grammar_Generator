@@ -8,3 +8,4 @@ cd verl
 pip3 install -e .
 
 pip install vllm==0.8.2 # maybe v0.6.3 occurs error
+pip install flashinfer-python

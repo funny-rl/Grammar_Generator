@@ -44,8 +44,6 @@ def main(config):
     run_ppo(config)
     
 def run_ppo(config) -> None:
-    
-    
     # TODO(linjunrong.ocss884): this ENV is left for resolving SGLang conflict with ray devices
     # isolation, will solve in the future
     os.environ["ENSURE_CUDA_VISIBLE_DEVICES"] = os.environ.get('CUDA_VISIBLE_DEVICES', '')
@@ -73,18 +71,20 @@ class TaskRunner:
         pprint(OmegaConf.to_container(config, resolve=True))  # resolve=True will eval symbol values
         OmegaConf.resolve(config)
         
-        customize_dataset(model_name = config.actor_rollout_ref.model.path)
+        customize_dataset(
+            model_name = config.actor_rollout_ref.model.path,
+            prompt_version = config.trainer.prompt_version,
+        )
 
         local_path = copy_to_local(config.actor_rollout_ref.model.path)
-        
-        trace_file_name = f"{config.trainer.project_name}_{config.trainer.experiment_name}_{datetime.now().strftime('%m-%d_%H-%M-%S')}"
-
+    
         # instantiate tokenizer
         from verl.utils import hf_tokenizer, hf_processor
         trust_remote_code = config.data.get('trust_remote_code', False)
+        # init module
         tokenizer = hf_tokenizer(local_path, trust_remote_code=trust_remote_code)
         processor = hf_processor(local_path, use_fast=True)  # used for multimodal LLM, could be none
-
+        
         # define worker classes
         if config.actor_rollout_ref.actor.strategy == 'fsdp':
             assert config.actor_rollout_ref.actor.strategy == config.critic.strategy
@@ -110,7 +110,6 @@ class TaskRunner:
             Role.ActorRollout: global_pool_id,
             Role.Critic: global_pool_id,
         }
-
         # we should adopt a multi-source reward function here
         # - for rule-based rm, we directly call a reward score
         # - for model-based rm, we call a model
@@ -152,16 +151,12 @@ class TaskRunner:
         reward_kwargs = dict(config.reward_model.get("reward_kwargs", {}))
         reward_fn = reward_manager_cls(tokenizer=tokenizer,
                                        num_examine=0,
-                                       trace_file_name = trace_file_name,
-                                       trace_file_dir = "./trace_output/",
                                        compute_score=compute_score,
                                        reward_fn_key=config.data.reward_fn_key,
                                        **reward_kwargs)
         # Note that we always use function-based RM for validation
         val_reward_fn = reward_manager_cls(tokenizer=tokenizer,
                                            num_examine=1,
-                                           trace_file_name = trace_file_name,
-                                           trace_file_dir = "./trace_output/",
                                            compute_score=compute_score,
                                            reward_fn_key=config.data.reward_fn_key)
         resource_pool_manager = ResourcePoolManager(resource_pool_spec=resource_pool_spec, mapping=mapping)

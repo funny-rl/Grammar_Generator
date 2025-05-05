@@ -97,12 +97,13 @@ def compute_score(
         data_source, 
         solution_str, 
         ground_truth, 
-        extra_info=None
+        extra_info=None,
+        test = False, 
     ):
     """
     compute the reward score of the solution string based on the data source and ground truth.
     """
-    solution = extract_solution(solution_str)
+    solution = solution_str #extract_solution(solution_str)
     total_reward = 0.0
     if solution is None:
         return total_reward
@@ -115,11 +116,11 @@ def compute_score(
             grammar = solution["grammar"]
             if set(grammar.keys()) != {"productions", "constraints"}:
                 return total_reward
-        
+
         except Exception as e:
             return total_reward
-
-        total_reward += 0.01
+        if not test:
+            total_reward += 0.01
 
         try:
             testcases, methods = get_testcases(
@@ -127,11 +128,20 @@ def compute_score(
                 k=10,
                 timeout = 10,
             )
-            print(f"\nTestcases: {testcases}")
-            print(f"Methods: {methods}\n")
-            total_reward += 0.99
+            if not test:
+                print(f"\nOutput: {solution}")
+                print(f"Testcases: {testcases}")
+                print(f"Methods: {methods}\n")
+            # else:
+            #     print(f"\nTest output: {solution}")
+            #     print(f"Test Testcases: {testcases}")
+            #     print(f"Test Methods: {methods}\n")
+            if not test:
+                total_reward += 0.99
+            else:
+                total_reward += 1.00
             return total_reward
             
         except Exception as e:
-            print(f"\nError: {e}\n")
+            #print(f"\nError: {e}\n")
             return total_reward

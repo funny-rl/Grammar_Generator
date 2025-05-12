@@ -3,7 +3,6 @@ import ray
 import hydra
 
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
-from prompt import customize_dataset
 
 def get_custom_reward_fn(config):
     import importlib.util, sys
@@ -71,9 +70,13 @@ class TaskRunner:
         pprint(OmegaConf.to_container(config, resolve=True))  # resolve=True will eval symbol values
         OmegaConf.resolve(config)
         
+        from prompts.sft_prompt import customize_dataset
         customize_dataset(
             model_name = config.actor_rollout_ref.model.path,
-            prompt_version = config.trainer.prompt_version,
+            train_data_path = config.data.train_files,
+            val_data_path = config.data.val_files,
+            test_data_path = None,
+            sft = False,
         )
 
         local_path = copy_to_local(config.actor_rollout_ref.model.path)

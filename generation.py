@@ -16,7 +16,7 @@ Generate responses given a dataset of prompts
 """
 
 import os
-
+import ast
 import hydra
 import numpy as np
 import ray
@@ -24,8 +24,6 @@ import ray
 os.environ["NCCL_DEBUG"] = "WARN"
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 # os.environ['TORCH_COMPILE_DISABLE'] = '1'
-
-from prompt import customize_dataset
 
 from pprint import pprint
 
@@ -63,18 +61,21 @@ def main_task(config):
     pprint(OmegaConf.to_container(config, resolve=True))  # resolve=True will eval symbol values
     OmegaConf.resolve(config)
     
+    from prompts.sft_prompt import customize_dataset
+    
     customize_dataset(
-        model_name = config.actor_rollout_ref.model.path,
-        prompt_version = config.rollout.prompt_version,
-        infer = True,
+        model_name = config.model.path,
+        train_data_path = None,
+        val_data_path = None,
+        test_data_path = config.data.path,
     )
 
     local_path = copy_to_local(config.model.path)
     trust_remote_code = config.data.get("trust_remote_code", False)
+    
     tokenizer = hf_tokenizer(
         name_or_path = local_path, 
         trust_remote_code=trust_remote_code,
-        post_train=config.model.post_train,
     )
 
     if config.rollout.temperature == 0.0:
@@ -83,6 +84,7 @@ def main_task(config):
 
     # read dataset. Note that the dataset should directly contain chat template format (e.g., a list of dictionary)
     dataset = pd.read_parquet(config.data.path)
+    print(config.data.prompt_key)
     chat_lst = dataset[config.data.prompt_key].tolist()
 
     chat_lst = [chat.tolist() for chat in chat_lst]
@@ -135,8 +137,9 @@ def main_task(config):
                 valid_response_length = data_item.batch["attention_mask"][prompt_length:].sum()
                 valid_response_ids = data_item.batch["responses"][:valid_response_length]
                 response_str = tokenizer.decode(valid_response_ids, skip_special_tokens=True)
-                output_texts.append(response_str)
 
+                pprint(f"Response {i}: {response_str}")
+                output_texts.append(response_str)
             output_lst[n_sample].extend(output_texts)
 
     # convert output_lst from (n_samples, n_data) to (n_data, n_sampels)
@@ -144,8 +147,8 @@ def main_task(config):
     output_lst = np.transpose(output_lst, axes=(1, 0)).tolist()
 
     # add to the data frame
-    dataset["responses"] = output_lst
-
+    dataset["grammar"] = output_lst
+    
     # write to a new parquet
     output_dir = os.path.dirname(config.data.output_path)
     makedirs(output_dir, exist_ok=True)

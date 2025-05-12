@@ -86,12 +86,36 @@ def get_testcases(
     tuples += get_testcase(ccfg, timeout, 0, k)
     return [t[0] for t in tuples], [t[1] for t in tuples]
 
-def extract_solution(solution_str):
-    answers = list(re.finditer(r"</think>", solution_str))
-    if not answers:
-        return None
-    end_pos = answers[-1].end()
-    return solution_str[end_pos:].strip()    
+
+from reward_model.grammar.discriminator import discriminator  # type: ignore
+from statistics import mean
+
+# Function to check if a test case is parsable using the ground-truth grammar
+def check_syntactic_validness(testcase: str, gt_grammar: dict) -> bool:
+    @timeout_decorator.timeout(10)  # type: ignore
+    def _check_syntactic_validness(testcase: str, grammar: dict) -> bool:
+        d = discriminator()
+        productions = grammar["productions"]
+        constraints = grammar["constraints"]
+        return d(productions, constraints, testcase)  # type: ignore
+    try:
+        # Check if the testcase is valid based on the grammar
+        return _check_syntactic_validness(testcase, gt_grammar)
+    except Exception as e:  # Handle timeout or other exceptions
+        return False
+def calculate_generality(testcases: list[str], gt_grammar: dict) -> float:
+    # Check each test case against the ground-truth grammar
+    parsable_cases = [check_syntactic_validness(testcase, gt_grammar) for testcase in testcases]
+    # Generality is the mean of the parsable cases (1 for parsable, 0 for not parsable)
+    generality = mean(parsable_cases)
+    return generality
+
+# def extract_solution(solution_str):
+#     answers = list(re.finditer(r"</think>", solution_str))
+#     if not answers:
+#         return None
+#     end_pos = answers[-1].end()
+#     return solution_str[end_pos:].strip()    
 
 def compute_score(
         data_source, 
@@ -103,45 +127,37 @@ def compute_score(
     """
     compute the reward score of the solution string based on the data source and ground truth.
     """
-    solution = solution_str #extract_solution(solution_str)
     total_reward = 0.0
-    if solution is None:
-        return total_reward
-    else:
-        try:
-            solution = ast.literal_eval(solution)
-            if set(solution.keys()) != {"grammar"}:
-                return total_reward
-            
-            grammar = solution["grammar"]
-            if set(grammar.keys()) != {"productions", "constraints"}:
-                return total_reward
+    try:
+        grammar = ast.literal_eval(solution_str)
 
-        except Exception as e:
+        if set(grammar.keys()) != {"productions", "constraints"}:
             return total_reward
-        if not test:
-            total_reward += 0.01
-
-        try:
-            testcases, methods = get_testcases(
-                grammar = grammar,
-                k=10,
-                timeout = 10,
+        
+        testcases, methods = get_testcases(
+            grammar = grammar,
+            k=10,
+            timeout = 10,
+        )
+        
+        print(f"\nGrammar: {grammar}")
+        
+        if grammar == ground_truth:
+            generality_score = 1.0
+        else:
+            # generality_score = 0.0
+            generality_score = calculate_generality(
+                testcases = testcases,
+                gt_grammar = ground_truth,
             )
-            if not test:
-                print(f"\nOutput: {solution}")
-                print(f"Testcases: {testcases}")
-                print(f"Methods: {methods}\n")
-            # else:
-            #     print(f"\nTest output: {solution}")
-            #     print(f"Test Testcases: {testcases}")
-            #     print(f"Test Methods: {methods}\n")
-            if not test:
-                total_reward += 0.99
-            else:
-                total_reward += 1.00
-            return total_reward
-            
-        except Exception as e:
-            #print(f"\nError: {e}\n")
-            return total_reward
+        total_reward += generality_score
+
+    
+    except Exception as e:
+        print(f"\nSolution string: {solution_str}")
+        print(f"Error: {e}")
+    
+    print(f"Ground truth: {ground_truth}")
+    print(f"Score: {total_reward}\n")
+    
+    return total_reward

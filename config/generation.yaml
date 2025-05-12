@@ -5,23 +5,24 @@ trainer:
 data:
   path: ./data/GGD/parquet/test.parquet
   prompt_key: prompt
-  n_samples: 1
-  output_path: ./checkpoints/grammar_generation
-  batch_size: 32
+  n_samples: 10
+  output_path: ./checkpoints/grammar_generation.parquet
+  batch_size: 64
 
 model:
   path: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
-  parameter: ./checkpoints/Grammar_Generation/GRPO_14B/global_step_1060/actor
-  post_trained: False
   external_lib: null
+  load_param: False
+  load_param_path: null
+
 rollout:
   name: vllm
   mode: sync # sync: LLM, async: AsyncLLM
-  temperature: 0
+  temperature: 1.2
   top_k: -1 # 0 for hf rollout, -1 for vllm rollout
-  top_p: 1.0
-  prompt_length: 2450
-  response_length: 512
+  top_p: 0.9
+  prompt_length: 2700
+  response_length: 300
   # for vllm rollout
   dtype: bfloat16 # should align with FSDP
   gpu_memory_utilization: 0.5
@@ -34,7 +35,7 @@ rollout:
   max_model_len: null
   max_num_seqs: 1024
   log_prob_micro_batch_size: null # will be deprecated, use log_prob_micro_batch_size_per_gpu
-  log_prob_micro_batch_size_per_gpu: 8
+  log_prob_micro_batch_size_per_gpu: 16
   # for fire vllm rollout
   use_fire_sampling: False # enable FIRE https://arxiv.org/abs/2410.21236
   # for hf rollout
@@ -42,7 +43,6 @@ rollout:
   disable_log_stats: True
   enable_chunked_prefill: True
   n: 1
-  prompt_version: "v1"
 actor:
   strategy: fsdp  # This is for backward-compatibility
   ulysses_sequence_parallel_size: 1 # sp size
@@ -51,5 +51,3 @@ actor:
 
 ray_init:
   num_cpus: null # `None` means using all CPUs, which might cause hang if limited in systems like SLURM. Please set to a number allowed then.
-
-trainer:

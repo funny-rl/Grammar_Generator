@@ -100,7 +100,7 @@ def get_instruction_func(modelname, prompt_version):
 
 def customize_dataset(
         model_name, 
-        prompt_version, 
+        prompt_version = "v1", 
         infer = False
     ):
     import os

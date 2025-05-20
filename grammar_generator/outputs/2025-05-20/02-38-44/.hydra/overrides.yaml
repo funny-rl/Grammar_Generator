@@ -1,0 +1,9 @@
+- data.train_files=./data/labeled_G/parquet/train.parquet
+- data.val_files=./data/labeled_G/parquet/valid.parquet
+- data.path=./data/labeled_G/
+- data.train_batch_size=16
+- data.micro_batch_size_per_gpu=2
+- trainer.default_local_dir=./checkpoints/sft/Grammar_Generation/SFT
+- trainer.project_name=Grammar_Generation
+- trainer.total_epochs=20
+- trainer.experiment_name=SFT

@@ -19,7 +19,6 @@ import torch
 from verl import DataProto
 from verl.utils.reward_score import _default_compute_score
 
-
 class NaiveRewardManager:
     """The reward manager."""
 
@@ -90,7 +89,6 @@ class NaiveRewardManager:
 
             if already_print_data_sources[data_source] < self.num_examine:
                 already_print_data_sources[data_source] += 1
-                print("[prompt]", prompt_str)
                 print("[response]", response_str)
                 print("[ground_truth]", ground_truth)
                 if isinstance(score, dict):

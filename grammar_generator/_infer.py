@@ -16,7 +16,7 @@ Generate responses given a dataset of prompts
 """
 
 import os
-
+import ast
 import hydra
 import numpy as np
 import ray
@@ -137,8 +137,10 @@ def main_task(config):
             
                 print(f"Response {i}: {response_str}")
                 
-                output_texts.append(response_str)
-
+                try:
+                    output_texts.append(ast.literal_eval(response_str))
+                except:
+                    output_texts.append(response_str)
             output_lst[n_sample].extend(output_texts)
 
     # convert output_lst from (n_samples, n_data) to (n_data, n_sampels)
@@ -151,7 +153,7 @@ def main_task(config):
     # write to a new parquet
     output_dir = os.path.dirname(config.data.output_path)
     makedirs(output_dir, exist_ok=True)
-    dataset.to_parquet(config.data.output_path)
+    dataset.to_json(config.data.output_path, orient="records", lines=True, force_ascii=False)
 
 
 if __name__ == "__main__":

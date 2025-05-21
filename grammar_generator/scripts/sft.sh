@@ -3,7 +3,7 @@
 set -x
 
 nproc_per_node=4
-project_name="SFT"
+project_name="Grammar_SFT"
 experiment_name="SFT"
 save_path="./checkpoints/sft/$project_name/$experiment_name"
 shift 2
@@ -17,4 +17,5 @@ torchrun --standalone --nnodes=1 --nproc_per_node=$nproc_per_node ./_sft_trainer
     trainer.default_local_dir=$save_path\
     trainer.project_name=$project_name\
     trainer.total_epochs=20\
+
     trainer.experiment_name=$experiment_name $@

@@ -750,7 +750,6 @@ class RayPPOTrainer:
         local_global_step_folder = os.path.join(self.config.trainer.default_local_dir, f"global_step_{self.global_steps}")
 
         print(f"local_global_step_folder: {local_global_step_folder}")
-        actor_local_path = os.path.join(local_global_step_folder, "actor")
 
         actor_remote_path = None if self.config.trainer.default_hdfs_dir is None else os.path.join(self.config.trainer.default_hdfs_dir, f"global_step_{self.global_steps}", "actor")
 
@@ -760,7 +759,7 @@ class RayPPOTrainer:
         max_actor_ckpt_to_keep = self.config.trainer.get("max_actor_ckpt_to_keep", None) if not remove_previous_ckpt_in_save else 1
         max_critic_ckpt_to_keep = self.config.trainer.get("max_critic_ckpt_to_keep", None) if not remove_previous_ckpt_in_save else 1
 
-        self.actor_rollout_wg.save_checkpoint(actor_local_path, actor_remote_path, self.global_steps, max_ckpt_to_keep=max_actor_ckpt_to_keep)
+        self.actor_rollout_wg.save_checkpoint(local_global_step_folder, actor_remote_path, self.global_steps, max_ckpt_to_keep=max_actor_ckpt_to_keep)
 
         if self.use_critic:
             critic_local_path = os.path.join(local_global_step_folder, "critic")
@@ -860,10 +859,7 @@ class RayPPOTrainer:
         )
 
         self.global_steps = 0
-
         # load checkpoint before doing anything
-        self._load_checkpoint()
-
         # perform validation before training
         # currently, we only support validation using the reward_function.
         if self.val_reward_fn is not None and self.config.trainer.get("val_before_train", True):
@@ -871,6 +867,7 @@ class RayPPOTrainer:
             assert val_metrics, f"{val_metrics=}"
             pprint(f"Initial validation metrics: {val_metrics}")
             logger.log(data=val_metrics, step=self.global_steps)
+            
             if self.config.trainer.get("val_only", False):
                 return
 
@@ -880,7 +877,7 @@ class RayPPOTrainer:
         # we start from step 1
         self.global_steps += 1
         last_val_metrics = None
-
+        best_val_rewards = float("-inf")
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
                 metrics = {}
@@ -1050,10 +1047,14 @@ class RayPPOTrainer:
                             if is_last_step:
                                 last_val_metrics = val_metrics
                         metrics.update(val_metrics)
-
-                    if self.config.trainer.save_freq > 0 and (is_last_step or self.global_steps % self.config.trainer.save_freq == 0):
-                        with _timer("save_checkpoint", timing_raw):
-                            self._save_checkpoint()
+                        
+                        for key in val_metrics:
+                            if "val-core" in key and "mean" in key:
+                                if val_metrics[key] > best_val_rewards:
+                                    best_val_rewards = metrics[key]
+                                    if self.config.trainer.save_freq > 0:
+                                        with _timer("save_checkpoint", timing_raw):
+                                            self._save_checkpoint()
 
                 # training metrics
                 metrics.update(

@@ -265,9 +265,9 @@ class ActorRolloutRefWorker(Worker):
             load_param_path = self.config.model.load_param_path
             if load_param_path is None:
                 raise ValueError("load_param_path should not be None when load_param is True")
-            param_path = os.path.join(copy_to_local(load_param_path), "model.pt")
+            param_path = os.path.join(copy_to_local(load_param_path))
             state_dict = torch.load(param_path, map_location="cpu")
-            actor_module.load_state_dict(state_dict,strict = True)
+            actor_module.load_state_dict(state_dict,strict = True, assign=True)
             print("\n" + "="*60)
             print(f"✅✅✅  SUCCESS: Model loaded from: {param_path}  ✅✅✅")
             print("="*60 + "\n")

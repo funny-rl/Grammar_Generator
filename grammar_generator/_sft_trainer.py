@@ -58,6 +58,7 @@ from verl.utils.ulysses import (
     ulysses_pad_and_slice_inputs,
 )
 from verl.workers.sharding_manager.fsdp_ulysses import FSDPUlyssesShardingManager
+from torch.distributed.fsdp import FullStateDictConfig, StateDictType
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_SFT_LOGGING_LEVEL", "WARN"))
@@ -482,8 +483,8 @@ class FSDPSFTTrainer:
                     shutil.rmtree(full_path)
                     
             os.makedirs(local_path, exist_ok=True)
-        
-        from torch.distributed.fsdp import FullStateDictConfig, StateDictType
+            
+        torch.distributed.barrier()
         
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -550,8 +551,8 @@ class FSDPSFTTrainer:
                 sent_acc_list.append(sent_acc)
                 token_acc_list.append(token_acc)
 
+            val_loss = torch.mean(torch.stack(val_losses))
             if rank == 0:
-                val_loss = torch.mean(torch.stack(val_losses))
                 sent_acc = torch.mean(torch.stack(sent_acc_list))
                 token_acc = torch.mean(torch.stack(token_acc_list))
                 metric = {
@@ -565,10 +566,7 @@ class FSDPSFTTrainer:
             if val_loss < min_val_loss:
                 min_val_loss = val_loss
                 self.save_checkpoint(step=global_step)
-                
-            
-            
-            
+
         if torch.distributed.is_initialized():
             torch.distributed.destroy_process_group()
 

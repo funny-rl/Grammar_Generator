@@ -1,10 +1,10 @@
-from prompts.base_instruction_dict_format import get_instruction_func, replace_description
+from prompts.base_instruction import get_instruction_func, replace_description
 
 def sft_dataset(
         model_name: str,
         data_path: str,
     ):
-    import os 
+    import os
     import json
     from datasets import load_dataset
     

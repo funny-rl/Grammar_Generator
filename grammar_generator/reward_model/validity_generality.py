@@ -26,7 +26,7 @@ def compute_score(
         #start = time.time()
         testcases, methods = get_testcases(
             grammar = grammar,
-            k=10,
+            k=5,
             timeout = 10,
         )
         total_reward += 0.5

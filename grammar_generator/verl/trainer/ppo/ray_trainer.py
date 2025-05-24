@@ -567,7 +567,6 @@ class RayPPOTrainer:
 
             # repeat test batch
             test_batch = test_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.val_kwargs.n, interleave=True)
-
             # we only do validation on rule-based rm
             if self.config.reward_model.enable and test_batch[0].non_tensor_batch["reward_model"]["style"] == "model":
                 return {}
@@ -625,6 +624,8 @@ class RayPPOTrainer:
             reward_tensor = result["reward_tensor"]
             scores = reward_tensor.sum(-1).cpu().tolist()
             sample_scores.extend(scores)
+            
+            print("val-scores in batch: ", scores)
 
             reward_extra_infos_dict["reward"].extend(scores)
             if "reward_extra_info" in result:
@@ -771,10 +772,10 @@ class RayPPOTrainer:
         dataloader_state_dict = self.train_dataloader.state_dict()
         torch.save(dataloader_state_dict, dataloader_local_path)
 
-        # latest checkpointed iteration tracker (for atomic usage)
-        local_latest_checkpointed_iteration = os.path.join(self.config.trainer.default_local_dir, "latest_checkpointed_iteration.txt")
-        with open(local_latest_checkpointed_iteration, "w") as f:
-            f.write(str(self.global_steps))
+        # # latest checkpointed iteration tracker (for atomic usage)
+        # local_latest_checkpointed_iteration = os.path.join(self.config.trainer.default_local_dir, "latest_checkpointed_iteration.txt")
+        # with open(local_latest_checkpointed_iteration, "w") as f:
+        #     f.write(str(self.global_steps))
 
     def _load_checkpoint(self):
         if self.config.trainer.resume_mode == "disable":
@@ -1049,7 +1050,7 @@ class RayPPOTrainer:
                         metrics.update(val_metrics)
                         
                         for key in val_metrics:
-                            if "val-core" in key and "mean" in key:
+                            if "val-aux" in key and "mean@" in key:
                                 if val_metrics[key] > best_val_rewards:
                                     best_val_rewards = metrics[key]
                                     if self.config.trainer.save_freq > 0:

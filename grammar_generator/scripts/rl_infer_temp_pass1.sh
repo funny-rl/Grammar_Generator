@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -x
+
+python ./_infer.py \
+    model.load_param=True \
+    model.load_param_path="./checkpoints/rl/Grammar_Generation/Validity_RL/global_step_130/model.pt" \
+    data.output_path="./model_output/val_rl_pass@1.jsonl" \
+    data.n_samples=1\
+    data.path="./data/labeled_G/parquet/test.parquet" \
+    rollout.temperature=0\
+    rollout.top_p=1.0

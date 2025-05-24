@@ -53,3 +53,6 @@ trainer:
   total_training_steps: null
   logger: ['console', 'wandb']
   seed: 1
+
+actor_rollout_ref:
+  processor: null # not use processor

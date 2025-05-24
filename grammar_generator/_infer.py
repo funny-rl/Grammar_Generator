@@ -74,10 +74,12 @@ def main_task(config):
     if config.rollout.temperature == 0.0:
         assert config.data.n_samples == 1, "When temperature=0, n_samples must be 1."
     assert config.data.n_samples >= 1, "n_samples should always >= 1"
-
+    
     # read dataset. Note that the dataset should directly contain chat template format (e.g., a list of dictionary)
     dataset = pd.read_parquet(config.data.path)
     chat_lst = dataset[config.data.prompt_key].tolist()
+    
+    
 
     chat_lst = [chat.tolist() for chat in chat_lst]
 
@@ -121,9 +123,8 @@ def main_task(config):
         for n_sample in range(config.data.n_samples):
             output_padded = wg.generate_sequences(data_padded)
             output = unpad_dataproto(output_padded, pad_size=pad_size)
-
             output_texts = []
-            for i in range(len(output)):
+            for i in range(len(output)): # len(output) -> batch_size x n
                 data_item = output[i]
                 prompt_length = data_item.batch["prompts"].shape[-1]
                 valid_response_length = data_item.batch["attention_mask"][prompt_length:].sum()
@@ -144,12 +145,16 @@ def main_task(config):
             output_lst[n_sample].extend(output_texts)
 
     # convert output_lst from (n_samples, n_data) to (n_data, n_sampels)
-    output_lst = np.array(output_lst, dtype=object)
+    output_lst = np.array(output_lst, dtype=object).reshape(config.rollout.n, -1)
     output_lst = np.transpose(output_lst, axes=(1, 0)).tolist()
 
     # add to the data frame
     dataset["grammar"] = output_lst
-
+    
+    columns_to_keep = ['name', 'description', 'grammar']
+    existing_columns_to_keep = [col for col in columns_to_keep if col in dataset.columns]
+    dataset = dataset[existing_columns_to_keep]
+    
     # write to a new parquet
     output_dir = os.path.dirname(config.data.output_path)
     makedirs(output_dir, exist_ok=True)

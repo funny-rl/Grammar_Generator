@@ -177,7 +177,7 @@ class RLHFDataset(Dataset):
             if self.video_key in row_dict:
                 videos = [process_video(video) for video in row_dict.pop(self.video_key)]
                 multi_modal_data["video"] = [video.numpy() for video in videos]
-
+            
             model_inputs = self.processor(text=[raw_prompt], images=images, videos=videos, return_tensors="pt")
 
             input_ids = model_inputs.pop("input_ids")

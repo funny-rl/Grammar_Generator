@@ -15,6 +15,7 @@ model:
   load_param: False
   load_param_path: null
 
+
 rollout:
   name: vllm
   mode: sync # sync: LLM, async: AsyncLLM
@@ -40,9 +41,11 @@ rollout:
   use_fire_sampling: False # enable FIRE https://arxiv.org/abs/2410.21236
   # for hf rollout
   do_sample: True
-  disable_log_stats: True
+  disable_log_stats: False
   enable_chunked_prefill: True
   n: 1
+  # if beam search activated, top_k, temperature and top_p will be ignored
+    
 actor:
   strategy: fsdp  # This is for backward-compatibility
   ulysses_sequence_parallel_size: 1 # sp size

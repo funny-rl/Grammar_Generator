@@ -373,6 +373,7 @@ def process_validation_metrics(data_sources: list[str], sample_inputs: list[str]
     # Calculate metrics for each group
     data_src2prompt2var2metric = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
     for data_source, prompt2var2vals in data_src2prompt2var2vals.items():
+        print(prompt2var2vals)
         for prompt, var2vals in prompt2var2vals.items():
             for var_name, var_vals in var2vals.items():
                 if isinstance(var_vals[0], str):

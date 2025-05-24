@@ -8,5 +8,13 @@ python ./_infer.py \
     data.output_path="./model_output/sft_pass@1.jsonl" \
     data.n_samples=1\
     data.path="./data/labeled_G/parquet/test.parquet" \
-    rollout.temperature=0\
-    rollout.top_p=1.0
+    rollout.name='hf'\
+    rollout.top_k=0\
+    rollout.temperature=1.0\
+    rollout.do_sample=False \
+    data.batch_size=4\
+    rollout.log_prob_micro_batch_size_per_gpu=1\
+    
+
+
+

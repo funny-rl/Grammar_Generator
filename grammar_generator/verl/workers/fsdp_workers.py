@@ -173,7 +173,7 @@ class ActorRolloutRefWorker(Worker):
         # note that we have to create model in fp32. Otherwise, the optimizer is in bf16, which is incorrect
         # TODO(zhangchi.usc1992): 1. support create from random initialized model. 2. Support init with FSDP directly
         self.tokenizer = hf_tokenizer(local_path, trust_remote_code=trust_remote_code)
-        self.processor = hf_processor(local_path, trust_remote_code=trust_remote_code)
+        self.processor = None # hf_processor(local_path, trust_remote_code=trust_remote_code)
 
         torch_dtype = fsdp_config.get("model_dtype", None)
         if torch_dtype is None:
@@ -607,7 +607,9 @@ class ActorRolloutRefWorker(Worker):
         meta_info = {
             "eos_token_id": self.generation_config.eos_token_id if self.generation_config is not None else self.tokenizer.eos_token_id,
             "pad_token_id": self.generation_config.pad_token_id if self.generation_config is not None else self.tokenizer.pad_token_id,
+            "do_sample": self.config.rollout.do_sample,
         }
+        
         prompts.meta_info.update(meta_info)
         with self.rollout_sharding_manager:
             log_gpu_memory_usage("After entering rollout sharding manager", logger=logger)
@@ -622,6 +624,7 @@ class ActorRolloutRefWorker(Worker):
                 else:
                     output = self.rollout.generate_sequences(prompts=prompts)
             else:
+                
                 output = self.rollout.generate_sequences(prompts=prompts)
             log_gpu_memory_usage("After rollout generation", logger=logger)
 

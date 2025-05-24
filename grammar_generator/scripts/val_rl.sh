@@ -14,8 +14,8 @@ python ./_rl.py \
     data.path="./data/${dataset}" \
     data.train_files="./data/${dataset}/parquet/train.parquet" \
     data.val_files="./data/${dataset}/parquet/valid.parquet" \
-    data.max_prompt_length=2600 \
-    data.max_response_length=300 \
+    data.max_prompt_length=2400 \
+    data.max_response_length=200 \
     data.train_batch_size=8 \
     data.val_batch_size=8 \
     actor_rollout_ref.actor.ppo_mini_batch_size=8\

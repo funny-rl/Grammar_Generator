@@ -145,7 +145,7 @@ def main_task(config):
             output_lst[n_sample].extend(output_texts)
 
     # convert output_lst from (n_samples, n_data) to (n_data, n_sampels)
-    output_lst = np.array(output_lst, dtype=object).reshape(config.rollout.n, -1)
+    output_lst = np.array(output_lst, dtype=object)
     output_lst = np.transpose(output_lst, axes=(1, 0)).tolist()
 
     # add to the data frame

@@ -1,8 +1,0 @@
-- model.load_param=True
-- model.load_param_path=./model/sft.pt
-- data.output_path=./model_output/sft_beam20_pass@10.jsonl
-- data.n_samples=10
-- rollout.n=1
-- data.path=./data/labeled_G/parquet/test.parquet
-- rollout.do_sample=False
-- 'rollout.beam_search.num_beams=20 '

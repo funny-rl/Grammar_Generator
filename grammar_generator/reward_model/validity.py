@@ -1,5 +1,6 @@
 import ast
-from reward_model.utils import extract_solution, get_testcases
+import time 
+from reward_model.utils import extract_solution, get_testcases, calculate_validity
 
 def compute_score(
     data_source, 
@@ -17,17 +18,34 @@ def compute_score(
         grammar = ast.literal_eval(solution)
 
         if set(grammar.keys()) != {"productions", "constraints"}:
-            return total_reward  # Invalid format
+            raise ValueError("Invalid grammar format")
+        
+        if ground_truth != {"productions": [""], "constraints": [""]}:
+            if grammar == ground_truth:
+                total_reward += 1.0
+                raise StopIteration
 
-        # Always test the grammar
-        testcases, methods = get_testcases(
-            grammar=grammar,
-            k=5,
-            timeout=10,
-        )
-        total_reward += 1.0
+            testcases, _ = get_testcases(
+                grammar=grammar,
+                k=10,
+                timeout=10,
+            )
+            validity_score = calculate_validity(
+                testcases = testcases,
+                gt_grammar = ground_truth,
+            )
+            total_reward += validity_score
+        
+        else:
+            testcases, _ = get_testcases(
+                grammar=grammar,
+                k=10,
+                timeout=10,
+            )
+            total_reward += 1.0
+                                                                                                                     
 
     except Exception:
-        pass  # Silently ignore all errors
+        pass            
 
-    return total_reward
+    return total_reward                               

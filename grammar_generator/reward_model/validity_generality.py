@@ -1,6 +1,6 @@
 import ast 
 import time
-from reward_model.utils import extract_solution, get_testcases, calculate_generality
+from reward_model.utils import extract_solution, get_testcases, calculate_validity
 
 
 def compute_score(
@@ -23,23 +23,27 @@ def compute_score(
             total_reward += 1.0
             raise StopIteration
         
-        #start = time.time()
         testcases, methods = get_testcases(
             grammar = grammar,
-            k=5,
+            k=10,
             timeout = 10,
         )
-        total_reward += 0.5
-        # middle = time.time()
-        generality_score = calculate_generality(
+        validity_score = calculate_validity(
             testcases = testcases,
             gt_grammar = ground_truth,
         )
-        total_reward += (generality_score / 2)
-        # end = time.time()
         
-        # print(f"Time taken for get_testcases: {middle - start} seconds")
-        # print(f"Time taken for calculate_generality: {end - middle} seconds")
+        gt_testcases, methods = get_testcases(
+            grammar = ground_truth,
+            k=10,
+            timeout = 10,
+        )
+
+        generality_score = calculate_validity(
+            testcases = gt_testcases,
+            gt_grammar = grammar,
+        )
+        total_reward += (validity_score * generality_score)
         
     except Exception as e:
         pass

@@ -472,7 +472,7 @@ class RayPPOTrainer:
         val_batch_size = self.config.data.val_batch_size  # Prefer config value if set
         if val_batch_size is None:
             val_batch_size = len(self.val_dataset)
-
+            
         self.val_dataloader = StatefulDataLoader(
             dataset=self.val_dataset,
             batch_size=val_batch_size,
@@ -1042,7 +1042,8 @@ class RayPPOTrainer:
                             )
 
                     # validate
-                    if self.val_reward_fn is not None and self.config.trainer.test_freq > 0 and (is_last_step or self.global_steps % self.config.trainer.test_freq == 0):
+                    if self.val_reward_fn is not None and self.config.trainer.test_freq > 0 and \
+                        (is_last_step or self.global_steps % self.config.trainer.test_freq == 0):
                         with _timer("testing", timing_raw):
                             val_metrics: dict = self._validate()
                             if is_last_step:

@@ -1,4 +1,4 @@
-from prompts.base_instruction import get_instruction_func, replace_description
+from prompts.base_instruction import get_instruction_func, replace_description, get_specification
 
 def infer_dataset(
         model_name: str,

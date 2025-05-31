@@ -29,7 +29,7 @@ def get_specification(description: str) -> str:
         end = len(description) if end < 0 else end
         specification = description[start:end].strip()
         return specification
-    
+
 def replace_description(description: str) -> str:
         description_replacements = [
             ('\\cdots', '...'),

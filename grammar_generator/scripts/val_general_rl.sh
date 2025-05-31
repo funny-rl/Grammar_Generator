@@ -17,7 +17,7 @@ python ./_rl.py \
     data.max_prompt_length=2010 \
     data.max_response_length=250 \
     data.train_batch_size=8 \
-    data.val_batch_size=8 \
+    data.val_batch_size=64 \
     actor_rollout_ref.actor.ppo_mini_batch_size=8\
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=${batch_size_per_gpu}\
     actor_rollout_ref.actor.ppo_max_token_len_per_gpu=13300\
@@ -31,10 +31,10 @@ python ./_rl.py \
     actor_rollout_ref.rollout.max_num_seqs=1024\
     trainer.save_freq=1\
     trainer.test_freq=10\
-    trainer.total_epochs=10\
+    trainer.total_epochs=3\
     actor_rollout_ref.model.load_param=True \
     actor_rollout_ref.model.load_param_path="./model/sft.pt" \
     actor_rollout_ref.rollout.tensor_model_parallel_size=4\
     trainer.n_gpus_per_node=4 \
     trainer.logger=['console','wandb'] \
-    trainer.default_local_dir="./checkpoints/rl/Grammar_Generation/validity_generality_rl" \
+    trainer.default_local_dir="./checkpoints/rl/Grammar_Generation/validityxgenerality_rl" \

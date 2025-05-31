@@ -1,7 +1,0 @@
-- model.load_param=True
-- model.load_param_path=./checkpoints/rl/Grammar_Generation/Validity_Generality_RL/global_step_120/model.pt
-- data.output_path=./checkpoints/sft_pass@1.parquet
-- data.n_samples=1
-- data.path=./data/labeled_G/parquet/test.parquet
-- rollout.temperature=0
-- rollout.top_p=1.0
